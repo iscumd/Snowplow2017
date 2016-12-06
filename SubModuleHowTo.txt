@@ -1,0 +1,4 @@
+#cd into submodule
+#run the following commands inside the empty submodule folder
+git submodule init
+git submodule update
