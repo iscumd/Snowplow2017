@@ -1,0 +1,3 @@
+[submodule "catkin_ws/src/VizO"]
+	path = catkin_ws/src/VizO
+	url = https://github.com/iscumd/VizO.git
