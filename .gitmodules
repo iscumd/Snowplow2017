@@ -7,3 +7,12 @@
 [submodule "catkin_ws/src/ZenithLocalization"]
 	path = catkin_ws/src/ZenithLocalization
 	url = https://github.com/iscumd/ZenithLocalization
+[submodule "catkin_ws/src/ZenithAprilTagReset"]
+	path = catkin_ws/src/ZenithAprilTagReset
+	url = https://github.com/iscumd/ZenithAprilTagReset
+[submodule "catkin_ws/src/ZenithObstacleDetector"]
+	path = catkin_ws/src/ZenithObstacleDetector
+	url = https://github.com/iscumd/ZenithObstacleDetector
+[submodule "catkin_ws/src/ZenithObstacleIdentifier"]
+	path = catkin_ws/src/ZenithObstacleIdentifier
+	url = https://github.com/iscumd/ZenithObstacleIdentifier
