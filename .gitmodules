@@ -4,3 +4,6 @@
 [submodule "catkin_ws/src/ZenithPathPlanner"]
 	path = catkin_ws/src/ZenithPathPlanner
 	url = https://github.com/iscumd/ZenithPathPlanner
+[submodule "catkin_ws/src/ZenithLocalization"]
+	path = catkin_ws/src/ZenithLocalization
+	url = https://github.com/iscumd/ZenithLocalization
