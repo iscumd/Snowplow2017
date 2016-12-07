@@ -1,3 +1,6 @@
 [submodule "catkin_ws/src/VizO"]
 	path = catkin_ws/src/VizO
 	url = https://github.com/iscumd/VizO.git
+[submodule "catkin_ws/src/ZenithPathPlanner"]
+	path = catkin_ws/src/ZenithPathPlanner
+	url = https://github.com/iscumd/ZenithPathPlanner
