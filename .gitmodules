@@ -4,9 +4,6 @@
 [submodule "catkin_ws/src/ZenithPathPlanner"]
 	path = catkin_ws/src/ZenithPathPlanner
 	url = https://github.com/iscumd/ZenithPathPlanner
-[submodule "catkin_ws/src/ZenithLocalization"]
-	path = catkin_ws/src/zenith_localization/
-	url = https://github.com/iscumd/ZenithLocalization
 [submodule "catkin_ws/src/ZenithAprilTagReset"]
 	path = catkin_ws/src/ZenithAprilTagReset
 	url = https://github.com/iscumd/ZenithAprilTagReset
@@ -16,3 +13,6 @@
 [submodule "catkin_ws/src/apriltags_ros"]
 	path = catkin_ws/src/apriltags_ros
 	url = https://github.com/iscumd/apriltags_ros.git
+[submodule "catkin_ws/src/zenith_localization"]
+	path = catkin_ws/src/zenith_localization
+	url = https://github.com/iscumd/ZenithLocalization.git
