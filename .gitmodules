@@ -13,3 +13,6 @@
 [submodule "catkin_ws/src/ZenithObstacleIdentifier"]
 	path = catkin_ws/src/ZenithObstacleIdentifier
 	url = https://github.com/iscumd/ZenithObstacleIdentifier
+[submodule "catkin_ws/src/apriltags_ros"]
+	path = catkin_ws/src/apriltags_ros
+	url = https://github.com/iscumd/apriltags_ros.git
