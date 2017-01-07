@@ -16,3 +16,9 @@
 [submodule "catkin_ws/src/zenith_localization"]
 	path = catkin_ws/src/zenith_localization
 	url = https://github.com/iscumd/ZenithLocalization.git
+[submodule "catkin_ws/src/ros_robot_visualizer"]
+	path = catkin_ws/src/ros_robot_visualizer
+	url = https://github.com/iscumd/Ros-Robot-Visualizer.git
+[submodule "catkin_ws/src/zenith_joystick_control"]
+	path = catkin_ws/src/zenith_joystick_control
+	url = https://github.com/iscumd/joystick-test.git
