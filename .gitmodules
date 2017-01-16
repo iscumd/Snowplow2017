@@ -1,12 +1,6 @@
-[submodule "catkin_ws/src/VizO"]
-	path = catkin_ws/src/VizO
-	url = https://github.com/iscumd/VizO.git
 [submodule "catkin_ws/src/ZenithPathPlanner"]
 	path = catkin_ws/src/zenith_path_planner
 	url = https://github.com/iscumd/ZenithPathPlanner
-[submodule "catkin_ws/src/ZenithAprilTagReset"]
-	path = catkin_ws/src/ZenithAprilTagReset
-	url = https://github.com/iscumd/ZenithAprilTagReset
 [submodule "catkin_ws/src/ZenithObstacleIdentifier"]
 	path = catkin_ws/src/ZenithObstacleIdentifier
 	url = https://github.com/iscumd/ZenithObstacleIdentifier
