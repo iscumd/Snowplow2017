@@ -10,9 +10,10 @@
 #include <pcl/sample_consensus/method_types.h>
 #include <pcl/sample_consensus/model_types.h>
 #include <pcl/segmentation/sac_segmentation.h>
+#include <pcl/filters/voxel_grid.h>
 #include <boost/foreach.hpp>
 
-ros::Publisher filter_pub, cylinder_pub, plane_pub;
+ros::Publisher filter_pub, voxel_pub, cylinder_pub, plane_pub;
 
   // All the objects needed
 //  pcl::PCDReader reader;
@@ -37,6 +38,7 @@ void zed_pointcloud_callback(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& 
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filteredz (new pcl::PointCloud<pcl::PointXYZRGB>);
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filteredx (new pcl::PointCloud<pcl::PointXYZRGB>);
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filteredy (new pcl::PointCloud<pcl::PointXYZRGB>);
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered_final (new pcl::PointCloud<pcl::PointXYZRGB>);
 
   pcl::PointCloud<pcl::Normal>::Ptr cloud_normals (new pcl::PointCloud<pcl::Normal>);
 
@@ -51,26 +53,38 @@ void zed_pointcloud_callback(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& 
 
   pass.setInputCloud (cloud_filteredz);
   pass.setFilterFieldName ("y");
-  pass.setFilterLimits (0, 4);
+  pass.setFilterLimits (-2, 2);
   //pass.setFilterLimitsNegative (true);
   pass.filter (*cloud_filteredy);
 
 
   pass.setInputCloud (cloud_filteredy);
   pass.setFilterFieldName ("x");
-  pass.setFilterLimits (0, 4);
+  pass.setFilterLimits (0.5, 4);
   //pass.setFilterLimitsNegative (true);
   pass.filter (*cloud_filteredx);
 
-  ROS_INFO("Point Cloud After Filter %d Points", cloud_filteredx->points.size());
+  ROS_INFO("Point Cloud After Position Filter %d Points", cloud_filteredx->points.size());
 
   filter_pub.publish (cloud_filteredx);
 
-  ROS_INFO("Published Point Cloud");
+  ROS_INFO("Published Position Filter Point Cloud");
+
+  // Create the filtering object
+  pcl::VoxelGrid<pcl::PointXYZRGB> sor;
+  sor.setInputCloud (cloud_filteredx);
+  sor.setLeafSize (0.01f, 0.01f, 0.01f);
+  sor.filter (*cloud_filtered_final);
+
+  ROS_INFO("Point Cloud After Voxel Filter %d Points", cloud_filteredx->points.size());
+
+  voxel_pub.publish (cloud_filtered_final);
+
+  ROS_INFO("Published Voxel Filter Point Cloud");
 
     // Estimate point normals
   ne.setSearchMethod (tree);
-  ne.setInputCloud (cloud_filteredx);
+  ne.setInputCloud (cloud_filtered_final);
   ne.setKSearch (10);
   ne.compute (*cloud_normals);
   ROS_INFO("Norms Computed");
@@ -82,14 +96,14 @@ void zed_pointcloud_callback(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& 
   seg.setMethodType (pcl::SAC_RANSAC);
   seg.setMaxIterations (100);
   seg.setDistanceThreshold (0.03);
-  seg.setInputCloud (cloud_filteredx);
+  seg.setInputCloud (cloud_filtered_final);
   seg.setInputNormals (cloud_normals);
   // Obtain the plane inliers and coefficients
   seg.segment (*inliers_plane, *coefficients_plane);
-//  std::cerr << "Plane coefficients: " << *coefficients_plane << std::endl;
+  ROS_INFO_STREAM("Plane coefficients: " << *coefficients_plane << std::endl);
   ROS_INFO("Planner Segmentation Complete");
   // Extract the planar inliers from the input cloud
-  extract.setInputCloud (cloud_filteredx);
+  extract.setInputCloud (cloud_filtered_final);
   extract.setIndices (inliers_plane);
   extract.setNegative (false);
 
@@ -97,10 +111,12 @@ void zed_pointcloud_callback(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& 
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_plane (new pcl::PointCloud<pcl::PointXYZRGB> ());
   extract.filter (*cloud_plane);
   ROS_INFO("Planner Extraction Complete");
-//  std::cerr << "PointCloud representing the planar component: " << cloud_plane->points.size () << " data points." << std::endl;
+  ROS_INFO("PointCloud representing the planar component: %d data points.");
 //  writer.write ("table_scene_mug_stereo_textured_plane.pcd", *cloud_plane, false);
 
   plane_pub.publish (cloud_plane);
+
+  ROS_INFO("Planner Extraction Published");
 
 }
 
@@ -111,6 +127,7 @@ int main(int argc, char** argv)
   filter_pub = nh.advertise<pcl::PointCloud<pcl::PointXYZRGB> >("zed_filtered_pointcloud", 1); 
   cylinder_pub = nh.advertise<pcl::PointCloud<pcl::PointXYZRGB> >("zed_cylinder_pointcloud", 1);
   plane_pub = nh.advertise<pcl::PointCloud<pcl::PointXYZRGB> >("zed_plane_pointcloud", 1);
+  voxel_pub = nh.advertise<pcl::PointCloud<pcl::PointXYZRGB> >("zed_voxel_pointcloud", 1);
   ros::Subscriber sub = nh.subscribe<pcl::PointCloud<pcl::PointXYZRGB> >("/zed/point_cloud/cloud_registered", 1, zed_pointcloud_callback);
   ros::spin();
 }
