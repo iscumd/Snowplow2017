@@ -3,19 +3,15 @@
 #include <pcl/point_types.h>
 #include <boost/foreach.hpp>
 
-typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
-
-void callback(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg)
+void zed_pointcloud_callback(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& zed_point_cloud)
 {
-  printf ("Cloud: width = %d, height = %d\n", msg->width, msg->height);
-  BOOST_FOREACH (const pcl::PointXYZ& pt, msg->points)
-    printf ("\t(%f, %f, %f)\n", pt.x, pt.y, pt.z);
+  ROS_INFO("Point Cloud Received");
 }
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "sub_pcl");
+  ros::init(argc, argv, "zed_pcl_segmenter");
   ros::NodeHandle nh;
-  ros::Subscriber sub = nh.subscribe<pcl::PointCloud<pcl::PointXYZRGB> >("/camera/point_cloud/cloud_registered", 1, zed_pointcloud_callback);
+  ros::Subscriber sub = nh.subscribe<pcl::PointCloud<pcl::PointXYZRGB> >("/zed/point_cloud/cloud_registered", 1, zed_pointcloud_callback);
   ros::spin();
 }
