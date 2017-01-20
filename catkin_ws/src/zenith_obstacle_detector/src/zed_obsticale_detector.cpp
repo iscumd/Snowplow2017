@@ -76,7 +76,7 @@ void zed_pointcloud_callback(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& 
   sor.setLeafSize (0.01f, 0.01f, 0.01f);
   sor.filter (*cloud_filtered_final);
 
-  ROS_INFO("Point Cloud After Voxel Filter %d Points", cloud_filteredx->points.size());
+  ROS_INFO("Point Cloud After Voxel Filter %d Points", cloud_filtered_final->points.size());
 
   voxel_pub.publish (cloud_filtered_final);
 
