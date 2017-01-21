@@ -1,16 +1,19 @@
 #include <ros/ros.h>
 #include <pcl_ros/point_cloud.h>
+#include <pcl/common/common.h>
 #include <pcl/point_types.h>
 #include <pcl/ModelCoefficients.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pcl/filters/extract_indices.h>
 #include <pcl/filters/passthrough.h>
+#include <pcl/filters/voxel_grid.h>
 #include <pcl/features/normal_3d.h>
+#include <pcl/kdtree/kdtree.h>
 #include <pcl/sample_consensus/method_types.h>
 #include <pcl/sample_consensus/model_types.h>
 #include <pcl/segmentation/sac_segmentation.h>
-#include <pcl/filters/voxel_grid.h>
+#include <pcl/segmentation/extract_clusters.h>
 #include <boost/foreach.hpp>
 
 ros::Publisher filter_pub, voxel_pub, cylinder_pub, plane_pub;
@@ -82,6 +85,43 @@ void zed_pointcloud_callback(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& 
 
   ROS_INFO("Published Voxel Filter Point Cloud");
 
+//Start Ken clustering Segmentation
+
+  tree->setInputCloud (cloud_filtered_final);
+
+  std::vector<pcl::PointIndices> cluster_indices;
+  pcl::EuclideanClusterExtraction<pcl::PointXYZRGB> ec;
+  ec.setClusterTolerance (0.02); // 2cm
+  ec.setMinClusterSize (100);
+  ec.setMaxClusterSize (25000);
+  ec.setSearchMethod (tree);
+  ec.setInputCloud (cloud_filtered_final);
+  ec.extract (cluster_indices);
+
+  int j = 0;
+  for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it)
+  {
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_cluster (new pcl::PointCloud<pcl::PointXYZRGB>);
+    for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); ++pit)
+    cloud_cluster->points.push_back (cloud_filtered_final->points[*pit]); //*
+    cloud_cluster->width = cloud_cluster->points.size ();
+    cloud_cluster->height = 1;
+    cloud_cluster->is_dense = true;
+
+    pcl::PointXYZRGB max;
+    pcl::PointXYZRGB min;
+    pcl::getMinMax3D(*cloud_cluster, max, min); 
+
+    ROS_INFO_STREAM("PointCloud representing the Cluster: " << j << " Has " << cloud_cluster->points.size () << " data points." << std::endl);
+    ROS_INFO_STREAM(" Max x:" << max.x << " Max y:" << max.y << " Max z:" << max.z << " Min x:" << min.x << "Min y" << min.y << " Min z" << min.z << std::endl);  
+    j++;
+  }
+
+//END Ken clustering Segmentation
+
+
+//Start Ken Planer Suface Segmentation Attempt
+/*
     // Estimate point normals
   ne.setSearchMethod (tree);
   ne.setInputCloud (cloud_filtered_final);
@@ -117,7 +157,8 @@ void zed_pointcloud_callback(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& 
   plane_pub.publish (cloud_plane);
 
   ROS_INFO("Planner Extraction Published");
-
+*/
+//END Ken Planer Segmentation
 }
 
 int main(int argc, char** argv)
