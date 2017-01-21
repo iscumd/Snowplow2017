@@ -50,20 +50,20 @@ void zed_pointcloud_callback(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& 
  
   pass.setInputCloud (zed_point_cloud);
   pass.setFilterFieldName ("z");
-  pass.setFilterLimits (-0.5, 0.5);
+  pass.setFilterLimits (-0.3, 1);
   //pass.setFilterLimitsNegative (true);
   pass.filter (*cloud_filteredz);
 
   pass.setInputCloud (cloud_filteredz);
   pass.setFilterFieldName ("y");
-  pass.setFilterLimits (-2, 2);
+  pass.setFilterLimits (-4, 4);
   //pass.setFilterLimitsNegative (true);
   pass.filter (*cloud_filteredy);
 
 
   pass.setInputCloud (cloud_filteredy);
   pass.setFilterFieldName ("x");
-  pass.setFilterLimits (0.5, 4);
+  pass.setFilterLimits (0.3, 3.5);
   //pass.setFilterLimitsNegative (true);
   pass.filter (*cloud_filteredx);
 
@@ -92,7 +92,7 @@ void zed_pointcloud_callback(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& 
   std::vector<pcl::PointIndices> cluster_indices;
   pcl::EuclideanClusterExtraction<pcl::PointXYZRGB> ec;
   ec.setClusterTolerance (0.02); // 2cm
-  ec.setMinClusterSize (100);
+  ec.setMinClusterSize (400);
   ec.setMaxClusterSize (25000);
   ec.setSearchMethod (tree);
   ec.setInputCloud (cloud_filtered_final);
@@ -110,10 +110,11 @@ void zed_pointcloud_callback(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& 
 
     pcl::PointXYZRGB max;
     pcl::PointXYZRGB min;
-    pcl::getMinMax3D(*cloud_cluster, max, min); 
+    pcl::getMinMax3D(*cloud_cluster, min, max); 
 
-    ROS_INFO_STREAM("PointCloud representing the Cluster: " << j << " Has " << cloud_cluster->points.size () << " data points." << std::endl);
-    ROS_INFO_STREAM(" Max x:" << max.x << " Max y:" << max.y << " Max z:" << max.z << " Min x:" << min.x << "Min y" << min.y << " Min z" << min.z << std::endl);  
+    ROS_INFO_STREAM("PointCloud representing the Cluster: " << j << " Has " << cloud_cluster->points.size () << " data points.");
+    ROS_INFO_STREAM("Center x:" << (max.x + min.x)/2 << " y:" << (max.y + min.y)/2 << " z:" << (max.z + min.z)/2);
+    ROS_INFO_STREAM("Size x:" << (max.x - min.x) << " y:" << (max.y - min.y) << " z:" << (max.z - min.z));
     j++;
   }
 
