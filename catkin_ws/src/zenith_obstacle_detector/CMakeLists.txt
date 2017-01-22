@@ -18,6 +18,8 @@ add_message_files(
   FILES
   SegmentObstacle.msg
   Obstacles.msg
+  Obstacle.msg
+  ObstacleList.msg
 )
 
 ## Generate added messages and services with any dependencies listed here
@@ -50,6 +52,7 @@ add_dependencies(obstacle_detection_node ${PROJECT_NAME}_gencpp)
 
 add_executable(zed_obsticale_detector src/zed_obsticale_detector.cpp)
 target_link_libraries(zed_obsticale_detector ${catkin_LIBRARIES})
+add_dependencies(zed_obsticale_detector ${PROJECT_NAME}_gencpp)
 
 #############
 ## Testing ##

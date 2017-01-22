@@ -16,7 +16,10 @@
 #include <pcl/segmentation/extract_clusters.h>
 #include <boost/foreach.hpp>
 
-ros::Publisher filter_pub, voxel_pub, cylinder_pub, plane_pub;
+#include<zenith_obstacle_detector/Obstacle.h>
+#include<zenith_obstacle_detector/ObstacleList.h>
+
+ros::Publisher filter_pub, voxel_pub, ObsArray_pub;
 
   // All the objects needed
 //  pcl::PCDReader reader;
@@ -98,6 +101,8 @@ void zed_pointcloud_callback(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& 
   ec.setInputCloud (cloud_filtered_final);
   ec.extract (cluster_indices);
 
+  zenith_obstacle_detector::ObstacleList obs_list;
+
   int j = 0;
   for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it)
   {
@@ -110,13 +115,38 @@ void zed_pointcloud_callback(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& 
 
     pcl::PointXYZRGB max;
     pcl::PointXYZRGB min;
-    pcl::getMinMax3D(*cloud_cluster, min, max); 
+    pcl::getMinMax3D(*cloud_cluster, min, max);
+
+    zenith_obstacle_detector::Obstacle obs; 
+
+    float xcenter, ycenter, xsize, ysize, zsize;
+    xcenter = (max.x + min.x)/2;
+    ycenter = (max.y + min.y)/2;
+
+    xsize = (max.x - min.x);
+    ysize = (max.y - min.y);
+    zsize = (max.z - min.z);
+
+    obs.x = xcenter;
+    obs.y = ycenter;
+    
+    if(ysize > .45 && ysize < .55){
+       obs.type = "moving";
+    }else if(ysize > .08 && ysize < .25){
+       obs.type = "static";
+    }else{
+       obs.type = "unkown";
+    }
+
+    obs_list.obstacles.push_back(obs);
 
     ROS_INFO_STREAM("PointCloud representing the Cluster: " << j << " Has " << cloud_cluster->points.size () << " data points.");
-    ROS_INFO_STREAM("Center x:" << (max.x + min.x)/2 << " y:" << (max.y + min.y)/2 << " z:" << (max.z + min.z)/2);
-    ROS_INFO_STREAM("Size x:" << (max.x - min.x) << " y:" << (max.y - min.y) << " z:" << (max.z - min.z));
+    ROS_INFO_STREAM("Center x:" << xcenter << " y:" << ycenter << " z:" << (max.z + min.z)/2);
+    ROS_INFO_STREAM("Size x:" << xsize << " y:" << ysize << " z:" << zsize);
     j++;
   }
+
+  ObsArray_pub.publish(obs_list);
 
 //END Ken clustering Segmentation
 
@@ -167,8 +197,7 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "zed_pcl_segmenter");
   ros::NodeHandle nh;
   filter_pub = nh.advertise<pcl::PointCloud<pcl::PointXYZRGB> >("zed_filtered_pointcloud", 1); 
-  cylinder_pub = nh.advertise<pcl::PointCloud<pcl::PointXYZRGB> >("zed_cylinder_pointcloud", 1);
-  plane_pub = nh.advertise<pcl::PointCloud<pcl::PointXYZRGB> >("zed_plane_pointcloud", 1);
+  ObsArray_pub = nh.advertise<zenith_obstacle_detector::ObstacleList>("zenith/obsticales", 1);
   voxel_pub = nh.advertise<pcl::PointCloud<pcl::PointXYZRGB> >("zed_voxel_pointcloud", 1);
   ros::Subscriber sub = nh.subscribe<pcl::PointCloud<pcl::PointXYZRGB> >("/zed/point_cloud/cloud_registered", 1, zed_pointcloud_callback);
   ros::spin();
