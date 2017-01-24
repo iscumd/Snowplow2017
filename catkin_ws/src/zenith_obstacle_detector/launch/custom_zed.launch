@@ -1,0 +1,15 @@
+<launch>
+
+  <arg name="svo_file" default=""/>
+  <arg name="zed_id" default="0"/>
+
+  <group ns="zed">
+    <include file="$(find zed_wrapper)/launch/custom_zed_camera.launch">
+      <arg name="svo_file" value="$(arg svo_file)" />
+      <arg name="zed_id" value="$(arg zed_id)" />
+    </include>
+  </group>
+
+  <node name="zed_obsticale_detector" pkg="zenith_obstacle_detector" type="zed_obsticale_detector"/>
+
+</launch>
