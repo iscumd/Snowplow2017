@@ -98,7 +98,7 @@ void zed_pointcloud_callback(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& 
   ec.setMinClusterSize (400);
   ec.setMaxClusterSize (25000);
   ec.setSearchMethod (tree);
-  ec.setInputCloud (cloud_filtered_final);
+ ec.setInputCloud (cloud_filtered_final);
   ec.extract (cluster_indices);
 
   zenith_obstacle_detector::ObstacleList obs_list;
@@ -130,7 +130,7 @@ void zed_pointcloud_callback(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& 
     obs.x = xcenter;
     obs.y = ycenter;
     
-    if(ysize > .45 && ysize < .55){
+    if(ysize > .45 && ysize < 333){
        obs.type = "moving";
     }else if(ysize > .08 && ysize < .25){
        obs.type = "static";
