@@ -19,3 +19,6 @@
 [submodule "catkin_ws/src/zed-ros-wrapper"]
 	path = catkin_ws/src/zed-ros-wrapper
 	url = https://github.com/iscumd/zed-ros-wrapper.git
+[submodule "catkin_ws/src/zenith_map_maker"]
+	path = catkin_ws/src/zenith_map_maker
+	url = https://github.com/iscumd/zenith_map_maker.git
